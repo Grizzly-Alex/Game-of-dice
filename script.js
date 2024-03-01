@@ -17,14 +17,23 @@ scoreElement0.textContent = '0';
 scoreElement1.textContent = '0';
 diceElement.classList.add('hidden');
 
+let isPlaying = true;
 let currentScore = 0;
 let activePlayer = 0;
+const winScore = 10;
 const totalScores = [0, 0];
 
 
+const switchActivePlayer = function () {
+    currentScore = 0;
+    document.getElementById(`current--${activePlayer}`).textContent = currentScore;
+    activePlayer = activePlayer === 0 ? 1 : 0;
+    playerElement0.classList.toggle('player--active');
+    playerElement1.classList.toggle('player--active');
+};
 
-//Roll the dice
-btnRoll.addEventListener('click', function () {
+
+const rollDice = function () {
     //1. Generate a random number
     const diceNumber = Math.trunc(Math.random()*6) +1;
     //2. Display number on the dice
@@ -36,10 +45,37 @@ btnRoll.addEventListener('click', function () {
         document.getElementById(`current--${activePlayer}`).textContent = currentScore;
     }
     else{
-        currentScore = 0;
-        document.getElementById(`current--${activePlayer}`).textContent = currentScore;
-        activePlayer = activePlayer === 0 ? 1 : 0;
-        playerElement0.classList.toggle('player--active');
-        playerElement1.classList.toggle('player--active');
+        switchActivePlayer();
     }
+};
+
+const holdScore = function () {
+    // 1. Add current score to active player total score
+    totalScores[activePlayer] += currentScore;
+    document.getElementById(`score--${activePlayer}`).textContent = totalScores[activePlayer];
+
+    /* 2. If total score of active player >= winScore variable, active player won, 
+    if not switch active player*/     
+    if (totalScores[activePlayer] >= winScore){
+        isPlaying = false;
+        diceElement.classList.add('hidden');
+        document.querySelector(`.player--${activePlayer}`).classList.add('player--winner')
+        document.querySelector(`.player--${activePlayer}`).classList.remove('player--active')
+    }
+    else{
+        switchActivePlayer();
+    }
+};
+
+
+document.addEventListener('click', function () {
+    if (!isPlaying){
+        btnRoll.removeEventListener('click', rollDice);
+        btnHold.removeEventListener('click', holdScore);
+    }
+    else{
+        btnRoll.addEventListener('click', rollDice);
+        btnHold.addEventListener('click', holdScore);
+    };
 });
+
