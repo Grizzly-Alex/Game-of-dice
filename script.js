@@ -12,19 +12,35 @@ const btnHold = document.querySelector('.btn--hold');
 const playerElement0 = document.querySelector('.player--0');
 const playerElement1 = document.querySelector('.player--1');
 
-//Game initial conditions
-scoreElement0.textContent = '0';
-scoreElement1.textContent = '0';
-diceElement.classList.add('hidden');
-
-let isPlaying = true;
-let currentScore = 0;
-let activePlayer = 0;
-const winScore = 10;
-const totalScores = [0, 0];
+let totalScores, winScore, currentScore, activePlayer, isPlaying;
 
 
-const switchActivePlayer = function () {
+const initGame = function () {
+    totalScores = [0, 0];
+    winScore = 100;
+    currentScore = 0;
+    activePlayer = 0;
+    isPlaying = true;
+       
+    scoreElement0.textContent = 0;
+    scoreElement1.textContent = 0;
+    currentScore0.textContent = 0;
+    currentScore1.textContent = 0;
+    
+    playerElement0.classList.remove('player--winner');
+    playerElement1.classList.remove('player--winner');
+    playerElement0.classList.remove('player--active');
+    playerElement1.classList.remove('player--active');
+    playerElement0.classList.add('player--active');
+    diceElement.classList.add('hidden');
+
+    btnNew.addEventListener('click', initGame);
+    btnRoll.addEventListener('click', rollDice);
+    btnHold.addEventListener('click', holdScore);
+    document.addEventListener('click', checkWinner);
+};
+
+const switchActivePlayer = () => {
     currentScore = 0;
     document.getElementById(`current--${activePlayer}`).textContent = currentScore;
     activePlayer = activePlayer === 0 ? 1 : 0;
@@ -32,8 +48,7 @@ const switchActivePlayer = function () {
     playerElement1.classList.toggle('player--active');
 };
 
-
-const rollDice = function () {
+const rollDice = () => {
     //1. Generate a random number
     const diceNumber = Math.trunc(Math.random()*6) +1;
     //2. Display number on the dice
@@ -49,13 +64,12 @@ const rollDice = function () {
     }
 };
 
-const holdScore = function () {
+const holdScore = () => {
     // 1. Add current score to active player total score
     totalScores[activePlayer] += currentScore;
     document.getElementById(`score--${activePlayer}`).textContent = totalScores[activePlayer];
 
-    /* 2. If total score of active player >= winScore variable, active player won, 
-    if not switch active player*/     
+    //2. If total score of active player >= winScore variable, active player won, if not switch active player 
     if (totalScores[activePlayer] >= winScore){
         isPlaying = false;
         diceElement.classList.add('hidden');
@@ -67,15 +81,15 @@ const holdScore = function () {
     }
 };
 
-
-document.addEventListener('click', function () {
-    if (!isPlaying){
+const checkWinner = () => {
+    if (!isPlaying) {
         btnRoll.removeEventListener('click', rollDice);
         btnHold.removeEventListener('click', holdScore);
     }
-    else{
-        btnRoll.addEventListener('click', rollDice);
-        btnHold.addEventListener('click', holdScore);
-    };
+};
+
+//Start game
+document.addEventListener('DOMContentLoaded', () => {
+    initGame();
 });
 
